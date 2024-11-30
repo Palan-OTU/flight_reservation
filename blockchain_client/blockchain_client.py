@@ -119,6 +119,28 @@ def index():
 @app.route('/book/flight')
 def book_flight():
     return render_template('bookflight.html')
+@app.route('/view/transactions')
+def view_transaction():
+    return render_template('view_transactions.html')
+@app.route('/generate/transaction', methods=['POST'])
+def generate_transaction():
+    sender_public_key = request.form['sender_public_key']
+    sender_private_key = request.form['sender_private_key']
+    recipient_public_key = "30819f300d06092a864886f70d010101050003818d00308189028181009ed883fa391a1edb13e66984a480d8a34bca2f92635988d4dbbaf02b3e1bd8c4b675f4323212a6ffc6a428af96212c5744e5a2d23d41ebbcdfa7cff15da32aa7dc3ce61c33e777abe95cdb11909330b6f6bebae58dc7bed32770e4cca7815180e55cb5017ca5976ddee3aad3c60612592a65e57e17869f84869a6129d5f4f6190203010001"
+    user_name = request.form['user_name']
+    source = request.form['source']
+    flight_number = request.form['flight_number']
+    destination = request.form['destination']
+    date = request.form['date']
+    amount = request.form['amount']
+    status = "Pending"
+    transaction = Transaction(user_name,flight_number,source,destination,date,sender_public_key,sender_private_key,recipient_public_key,amount ,status)
+    response = {'transaction':transaction.to_dict(),
+                'signature':transaction.sign_transaction()}
+    print(response['transaction'])
+    return jsonify(response),200
+
+
 @app.route('/wallet/new')
 def new_wallet():
     random_gen = Crypto.Random.new().read
@@ -161,6 +183,11 @@ def fetch_flights():
 
     # Convert to list of dictionaries and return
     return jsonify(filtered_flights.to_dict('records'))
+
+
+@app.route('/view/status')
+def view_status():
+    return render_template('status.html')
 
 
 if __name__ == '__main__':

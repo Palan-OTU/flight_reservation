@@ -192,6 +192,21 @@ def get_chain():
 
     return jsonify(response), 200
 
+@app.route('/search_booking', methods=['POST'])
+def search_booking():
+    booking_id = request.form.get('booking_id')
+    print(blockchain.chain)
+    # Iterate through the blockchain in reverse order
+    for block in reversed(blockchain.chain):
+        # Iterate through transactions in the block in reverse order
+        for transaction in reversed(block['transactions']):
+            if transaction['booking_id'] == booking_id:
+                # Return the first match found (most recent transaction)
+                return jsonify({'transaction': transaction, 'status': 'success'}), 200
+
+    # If no match is found
+    return jsonify({'message': 'Booking ID not found', 'status': 'error'}), 404
+
 
 @app.route('/mine', methods=['GET'])
 def mine():
